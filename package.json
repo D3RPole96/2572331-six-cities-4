@@ -45,6 +45,7 @@
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "got": "^14.4.7",
+    "http-status-codes": "^2.3.0",
     "inversify": "^6.2.2",
     "json-server": "^0.17.4",
     "mongoose": "^8.14.2",
