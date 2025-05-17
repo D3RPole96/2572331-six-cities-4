@@ -5,6 +5,7 @@ import { Config, RestSchema } from '../shared/libs/config/index.js';
 import { Component } from '../shared/types/index.js';
 import { DatabaseClient } from '../shared/libs/database-client/index.js';
 import { getMongoURI } from '../shared/helpers/index.js';
+import { Controller } from '../shared/libs/rest/index.js';
 
 @injectable()
 export class RestApplication {
@@ -14,6 +15,7 @@ export class RestApplication {
     @inject(Component.Logger) private readonly logger: Logger,
     @inject(Component.Config) private readonly config: Config<RestSchema>,
     @inject(Component.DatabaseClient) private readonly databaseClient: DatabaseClient,
+    @inject(Component.UserController) private readonly userController: Controller,
   ) {
     this.server = express();
   }
@@ -35,14 +37,22 @@ export class RestApplication {
     this.server.listen(port);
   }
 
+  private async _initControllers() {
+    this.server.use('/categories', this.userController.router);
+  }
+
   public async init() {
     this.logger.info('Application initialization');
 
-    this.logger.info('Init database…');
+    this.logger.info('Init database...');
     await this._initDb();
     this.logger.info('Init database completed');
 
-    this.logger.info('Try to init server…');
+    this.logger.info('Init controllers');
+    await this._initControllers();
+    this.logger.info('Controller initialization completed');
+
+    this.logger.info('Try to init server...');
     await this._initServer();
     this.logger.info(`🚀 Server started on http://localhost:${this.config.get('PORT')}`);
   }
